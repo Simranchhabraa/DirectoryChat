@@ -7,7 +7,11 @@ module BxBlockChat
       def create
         @message = @conversation.messages.new(message_params)
         if @message.save
-          render json: @message
+          message_with_timestamp = @message.attributes.merge(
+            created_at: @message.created_at.strftime('%Y-%m-%d %H:%M:%S')
+          )
+          render json: message_with_timestamp
+          # render json: @message
         else
           render json: { error: "Failed to create message" }, status: :unprocessable_entity
         end

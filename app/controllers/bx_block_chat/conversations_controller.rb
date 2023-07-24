@@ -2,18 +2,8 @@ module BxBlockChat
   class ConversationsController < ApplicationController
     protect_from_forgery with: :null_session
 
-    def index 
-      @users = User.all
-      users_data = @users.map do |user|
-        {
-          name: user.firstname,
-          profile_picture: user.image,
-          type: user.type
-        }
-      end
-      render json: users_data
-    end 
     def create  
+      # debugger
       if Conversation.between(params[:sender_id], params[:recipient_id]).present? 
         @conversation = Conversation.between(params[:sender_id], params[:recipient_id]).first
       else
@@ -36,11 +26,18 @@ module BxBlockChat
       }
       if @user.conversations.any?
       @conversation = Conversation.find(params[:id])
-      @message = @conversation.messages.map{|m| m.body} 
-        render json: { users: users_data, chat: @message }
-      else
-        render json: { users: users_data, chat: [] }
+      messages_with_timestamps = @conversation.messages.map do |message|
+        {
+          body: message.body,
+          date: message.created_at.strftime('%Y-%m-%d'),
+          time: message.created_at.strftime('%H:%M:%S')
+        }
       end
+  
+      render json: { users: users_data, chat: messages_with_timestamps }
+    else
+      render json: { users: users_data, chat: [] }
+    end
     end
     private
     def conversation_params

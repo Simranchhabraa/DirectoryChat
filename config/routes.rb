@@ -9,10 +9,12 @@ Rails.application.routes.draw do
     end
     # get 'users/:id', to: 'conversations#information', as: :user_information
   end
+  namespace :bx_block_admin do
+    resources :users
+  end
   devise_for :admin_users, ActiveAdmin::Devise.config
   devise_for :users
   ActiveAdmin.routes(self)
-  resources :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")

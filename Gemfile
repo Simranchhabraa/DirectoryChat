@@ -74,3 +74,4 @@ end
 gem "activeadmin"
 gem "devise"
 gem 'sassc-rails'
+gem 'active_model_serializers'
