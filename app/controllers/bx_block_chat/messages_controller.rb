@@ -19,7 +19,7 @@ module BxBlockChat
 
       private
       def message_params
-        params.require(:message).permit(:body, :user_id, :conversation_id)
+        params.permit(:body, :user_id, :conversation_id)
         end
   end
 end
