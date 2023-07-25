@@ -39,14 +39,9 @@ RSpec.describe BxBlockAdmin::UsersController, type: :controller do
 
       expect(response).to have_http_status(:created)
       expect(response.content_type).to include("application/json")
-      # Parse the response body as JSON
       response_json = JSON.parse(response.body)
-
-      # Check the response data attributes
       expect(response_json["user"]["firstname"]).to eq(user_params[:firstname])
       expect(response_json["user"]["lastname"]).to eq(user_params[:lastname])
-      # Add more attributes to check
-
       expect(response_json["message"]).to eq("User was successfully created.")
     end
 
@@ -57,26 +52,27 @@ RSpec.describe BxBlockAdmin::UsersController, type: :controller do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.content_type).to include("application/json")
-    end
+      response_json = JSON.parse(response.body)
+
+      expect(response_json["errors"]).to include("Email is invalid")
+      expect(response_json["errors"]).to include("Password can't be blank")
+   end
   end
 
   describe "GET #search_users" do
     it "returns matching users based on search query" do
       user1 = FactoryBot.create(:user, firstname: "John", lastname: "Doe")
-  
-      # Create more users if needed for additional matching users
-      # user2 = FactoryBot.create(:user, firstname: "Jane", lastname: "Smith")
+      user2 = FactoryBot.create(:user, firstname: "Jane", lastname: "Smith")
+      user3 = FactoryBot.create(:user, firstname: "Jane", lastname: "Doe")
+      user4 = FactoryBot.create(:user, firstname: "Jane", lastname: "Smith")
   
       get :search_users, params: { query: "John" }
   
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to include("application/json")
-  
-      # Parse the response body as JSON
       response_json = JSON.parse(response.body)
       expect(response_json).to be_an(Array)
-
-      # Check if the response contains the matching users
+      expect(response_json.size).to eq(1)
       expect(response_json).to include(
         {
           "firstname" => user1.firstname,
@@ -84,8 +80,29 @@ RSpec.describe BxBlockAdmin::UsersController, type: :controller do
           "lastname" => user1.lastname,
           "image" => user1.image,
           "type" => user1.type
+        })
+        expect(response_json).not_to include(
+        {
+          "firstname" => user2.firstname,
+          "id" => user2.id,
+          "lastname" => user2.lastname,
+          "image" => user2.image,
+          "type" => user2.type
         },
-        # Add more expectations for other matching users
+        {
+          "firstname" => user3.firstname,
+          "id" => user3.id,
+          "lastname" => user3.lastname,
+          "image" => user3.image,
+          "type" => user3.type
+        },
+        {
+          "firstname" => user4.firstname,
+          "id" => user4.id,
+          "lastname" => user4.lastname,
+          "image" => user4.image,
+          "type" => user4.type
+        }
       )
     end
   
@@ -94,13 +111,9 @@ RSpec.describe BxBlockAdmin::UsersController, type: :controller do
   
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response.content_type).to include("application/json")
-  
-      # Parse the response body as JSON
       response_json = JSON.parse(response.body)
   
-      # Check if the response contains the error message
       expect(response_json).to eq({ "error" => "Search query cannot be empty" })
     end
   end
-  
 end

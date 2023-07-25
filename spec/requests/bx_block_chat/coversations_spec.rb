@@ -31,7 +31,12 @@ RSpec.describe BxBlockChat::ConversationsController, type: :controller do
       it 'returns a JSON response with the new conversation' do
         post :create, params: { sender_id: user1.id, recipient_id: user2.id }
         parsed_response = JSON.parse(response.body)
-        expect(parsed_response['id']).to eq(Conversation.last.id)
+        new_conversation = Conversation.last
+        expect(parsed_response).to include(
+          'id' => new_conversation.id,
+          'sender_id' => new_conversation.sender_id,
+          'recipient_id' => new_conversation.recipient_id)
+        # expect(parsed_response['id']).to eq(Conversation.last.id)
       end
       it 'returns a 200 status code' do
         post :create, params: { sender_id: user1.id, recipient_id: user2.id }
